@@ -1,5 +1,5 @@
 {
-  "name": "dagger-php-module",
+  "name": "php",
   "engineVersion": "v0.19.10",
   "sdk": {
     "source": "php"

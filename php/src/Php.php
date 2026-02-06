@@ -13,7 +13,7 @@ use function rtrim;
 use function str_contains;
 
 #[DaggerObject]
-class DaggerPhpModule
+class Php
 {
     private Container $phpContainer;
 
@@ -55,7 +55,7 @@ class DaggerPhpModule
     }
 
     #[DaggerFunction]
-    public function withVersion(string $phpTagOrVersion = '', string $repository = ''): DaggerPhpModule
+    public function withVersion(string $phpTagOrVersion = '', string $repository = ''): Php
     {
         $that = clone $this;
         $that->phpContainer = $that->getContainerFromVersion($phpTagOrVersion, $repository);
@@ -64,7 +64,7 @@ class DaggerPhpModule
     }
 
     #[DaggerFunction]
-    public function withComposer(bool $withComposer = true): DaggerPhpModule
+    public function withComposer(bool $withComposer = true): Php
     {
         $that = clone $this;
         $that->withComposer = $withComposer;
@@ -73,7 +73,7 @@ class DaggerPhpModule
     }
 
     #[DaggerFunction]
-    public function withPie(bool $withPie = true): DaggerPhpModule
+    public function withPie(bool $withPie = true): Php
     {
         $that = clone $this;
         $that->withPie = $withPie;
@@ -82,7 +82,7 @@ class DaggerPhpModule
     }
 
     #[DaggerFunction]
-    public function withEnvVariable(string $name, string $value): DaggerPhpModule
+    public function withEnvVariable(string $name, string $value): Php
     {
         $that = clone $this;
         $that->envVariables[$name] = $value;
