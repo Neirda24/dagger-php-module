@@ -1,0 +1,14 @@
+{
+  "name": "app",
+  "engineVersion": "v0.19.10",
+  "sdk": {
+    "source": "php"
+  },
+  "dependencies": [
+    {
+      "name": "php",
+      "source": "../php"
+    }
+  ],
+  "source": ".dagger"
+}
