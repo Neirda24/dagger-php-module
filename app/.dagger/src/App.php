@@ -8,6 +8,7 @@ use Dagger\Attribute\DaggerFunction;
 use Dagger\Attribute\DaggerObject;
 use Dagger\Attribute\DefaultPath;
 use Dagger\Attribute\Doc;
+use Dagger\Container;
 use Dagger\Directory;
 use function Dagger\dag;
 
@@ -19,7 +20,7 @@ class App
     public function debug(
         #[DefaultPath('.')]
         Directory $sources
-    ): \Dagger\Php {
+    ): Container {
         return dag()
             ->php('8.5-cli')
             ->withSources($sources)
@@ -29,6 +30,7 @@ class App
             ->withComposer()
                 ->install()
             ->endComposer()
+            ->container()
         ;
     }
 }

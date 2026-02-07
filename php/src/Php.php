@@ -8,7 +8,6 @@ use Dagger\Attribute\DaggerFunction;
 use Dagger\Attribute\DaggerObject;
 use Dagger\Container;
 use Dagger\Directory;
-use JMS\Serializer\Annotation\Type;
 use function Dagger\dag;
 use function rtrim;
 use function str_contains;
@@ -23,18 +22,15 @@ class Php
     private bool $withComposer = false;
     private bool $withPie = false;
 
-    /**
-     * @var array<string, string>
-     */
-    #[Type('array<string, string>')]
-    private array $envVariables = [];
-
     #[DaggerFunction]
     public function __construct(
         string $phpTagOrVersion = '',
         string $repository = ''
     ) {
-        $this->withContainer($this->getContainerFromVersion($phpTagOrVersion, $repository));
+        $this->phpContainer = $this
+            ->withContainer($this->getContainerFromVersion($phpTagOrVersion, $repository))
+            ->phpContainer
+        ;
     }
 
     private function getContainerFromVersion(string $phpTagOrVersion = '', string $repository = ''): Container
@@ -104,7 +100,7 @@ class Php
     public function withEnvVariable(string $name, string $value): Php
     {
         $that = clone $this;
-        $that->envVariables[$name] = $value;
+        $that->phpContainer = $that->phpContainer->withEnvVariable($name, $value);
 
         return $that;
     }
@@ -128,10 +124,6 @@ class Php
     #[DaggerFunction]
     public function container(): Container
     {
-        foreach ($this->envVariables as $name => $value) {
-            $phpContainer = $phpContainer->withEnvVariable($name, $value);
-        }
-
-        return $this->phpContainer = $phpContainer;
+        return $this->phpContainer;
     }
 }

@@ -1390,12 +1390,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/BetterReflection.git",
-                "reference": "282505615820acdaf4c0a647306ae4939ea8a6b8"
+                "reference": "65739bd1155605c2212e4722cf799cbb9578aea2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/BetterReflection/zipball/282505615820acdaf4c0a647306ae4939ea8a6b8",
-                "reference": "282505615820acdaf4c0a647306ae4939ea8a6b8",
+                "url": "https://api.github.com/repos/Roave/BetterReflection/zipball/65739bd1155605c2212e4722cf799cbb9578aea2",
+                "reference": "65739bd1155605c2212e4722cf799cbb9578aea2",
                 "shasum": ""
             },
             "require": {
@@ -1452,7 +1452,7 @@
                 "issues": "https://github.com/Roave/BetterReflection/issues",
                 "source": "https://github.com/Roave/BetterReflection/tree/6.70.x"
             },
-            "time": "2026-02-05T10:42:22+00:00"
+            "time": "2026-02-07T02:11:21+00:00"
         },
         {
             "name": "symfony/console",
