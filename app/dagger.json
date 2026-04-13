@@ -8,6 +8,10 @@
     {
       "name": "php",
       "source": "../php"
+    },
+    {
+      "name": "phpstan",
+      "source": "../phpstan"
     }
   ],
   "source": ".dagger"
