@@ -24,12 +24,15 @@ class App
         return dag()
             ->php('8.5-cli')
             ->withSources($sources)
+
             ->withPie()
                 ->install()
             ->endPie()
+
             ->withComposer()
                 ->install()
             ->endComposer()
+
             ->container()
         ;
     }

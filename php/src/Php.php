@@ -112,7 +112,7 @@ class Php
         $that->phpContainer = $container;
 
         $phpVersion = $that->phpVersion();
-        $aptCache = dag()->cacheVolume("apt-cache-{$phpVersion}");
+        $aptCache = dag()->cacheVolume("apt-cache-archives-{$phpVersion}");
 
         $that->phpContainer = $that->phpContainer
             ->withMountedCache('/var/cache/apt/archives', $aptCache)
