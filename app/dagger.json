@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "engineVersion": "v0.19.11",
+  "engineVersion": "v0.20.5",
   "sdk": {
     "source": "php"
   },
@@ -8,6 +8,10 @@
     {
       "name": "php",
       "source": "../php"
+    },
+    {
+      "name": "phpstan",
+      "source": "../phpstan"
     }
   ],
   "source": ".dagger"

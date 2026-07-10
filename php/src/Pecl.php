@@ -12,16 +12,15 @@ use Dagger\Container;
 use Dagger\ReturnType;
 use function array_filter;
 use function array_map;
-use function Dagger\dag;
 use function trim;
 
 #[DaggerObject]
-#[Doc('PIE (PHP Install Extension) — the modern PHP extension installer. Use this for extensions available on the PIE registry (https://php-ie.github.io/).')]
-final class Pie
+#[Doc('PECL legacy PHP extension installer. Use this for extensions not yet available via PIE (e.g. redis, imagick, memcached). Prefer PIE when the extension is available there.')]
+final class Pecl
 {
     use ContainerTrait;
 
-    private bool $pieInstalled = false;
+    private bool $peclInstalled = false;
     private Container $container;
 
     public function __construct(private Php $php)
@@ -29,8 +28,8 @@ final class Pie
     }
 
     #[DaggerFunction]
-    #[Doc('Return to the parent PHP container with all installed extensions applied.')]
-    public function endPie(): Php
+    #[Doc('Return to the parent PHP container with all installed PECL extensions applied.')]
+    public function endPecl(): Php
     {
         return $this->php->withContainer($this->getContainer());
     }
@@ -47,67 +46,64 @@ final class Pie
         return $this->container ??= $this->php->container();
     }
 
-    private function installPie(): void
+    private function installPecl(): void
     {
-        if ($this->pieInstalled === true) {
+        if ($this->peclInstalled === true) {
             return;
         }
 
         $alreadyInstalled = $this->getContainer()
-            ->withExec(['which', 'pie'], expect: ReturnType::ANY)
+            ->withExec(['which', 'pecl'], expect: ReturnType::ANY)
             ->exitCode() === 0;
 
         if ($alreadyInstalled) {
-            $this->pieInstalled = true;
+            $this->peclInstalled = true;
             return;
         }
-
-        $pieBin = dag()->container()->from('ghcr.io/php/pie:bin')->file('/pie');
 
         $this->container = $this->getContainer()
             ->withExec(['apt', 'update'])
             ->withExec(['apt', 'install', '-y', '--no-install-recommends',
+                'php-pear',
+                'php-dev',
                 'gcc',
                 'make',
                 'autoconf',
-                'libtool',
-                'bison',
-                're2c',
                 'pkg-config',
-                'unzip',
             ])
-            ->withFile('/usr/bin/pie', $pieBin)
+            ->withExec(['pecl', 'channel-update', 'pecl.php.net'])
         ;
 
-        $this->pieInstalled = true;
+        $this->peclInstalled = true;
     }
 
     #[DaggerFunction]
-    #[Doc('Download, build, and install one or more PIE-compatible PHP extensions.')]
+    #[Doc('Install one or more PECL extensions. Each extension is installed and enabled automatically.')]
     public function install(
         #[ListOfType('string')]
-        #[Doc('Package name and optional version constraint in the format {vendor/package}{?:{?version}{?@stability}}. Examples: "xdebug/xdebug", "xdebug/xdebug:^3.4", "xdebug/xdebug:^3.4@alpha".')]
+        #[Doc('PECL extension names with optional version (e.g. "redis", "xdebug-3.3.0", "imagick").')]
         array $packages = [],
 
-        #[Doc('Force installation even when the version does not match metadata constraints or when signature verification is unavailable.')]
+        #[Doc('Force installation even when the extension is already installed.')]
         bool $force = false,
-    ): Pie {
+    ): Pecl {
         $that = clone $this;
-        $that->installPie();
-
-        $installCmd = ['pie', 'install', '--allow-non-interactive-project-install'];
-
-        if ($force === true) {
-            $installCmd[] = '--force';
-        }
+        $that->installPecl();
 
         $packages = array_filter(
             array_map(static fn (mixed $p) => trim((string) $p), $packages),
             static fn (string $p) => $p !== '',
         );
 
+        $forceFlag = $force ? ['-f'] : [];
+
         foreach ($packages as $package) {
-            $that->container = $that->getContainer()->withExec([...$installCmd, $package]);
+            $extensionName = explode('-', $package)[0];
+
+            $that->container = $that->getContainer()
+                ->withExec(['pecl', 'install', ...$forceFlag, $package])
+                ->withExec(['bash', '-c', "echo 'extension={$extensionName}.so' > /usr/local/etc/php/conf.d/{$extensionName}.ini"])
+            ;
         }
 
         return $that;
