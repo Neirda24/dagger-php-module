@@ -1,7 +1,7 @@
 {
   "name": "php",
-  "engineVersion": "v0.20.5",
+  "engineVersion": "v0.21.7",
   "sdk": {
-    "source": "php"
+    "source": "./../dagger/sdk/php"
   }
 }

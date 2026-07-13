@@ -12,6 +12,7 @@ use Dagger\Attribute\Ignore;
 use Dagger\Attribute\ListOfType;
 use Dagger\Container;
 use Dagger\Directory;
+use Dagger\PhpAuditFormat;
 use function Dagger\dag;
 
 #[DaggerObject]
@@ -26,15 +27,17 @@ class App
         Directory $sources,
     ): Container {
         return dag()
-            ->php('8.3-cli')
+            ->php('8.4-cli')
             ->withSources($sources)
 
             ->withPie()
-                ->install()
+                ->install(selects: [
+                    'pcov=pecl/pcov',
+                ])
             ->endPie()
 
             ->withComposer()
-                ->install()
+                ->install(audit: PhpAuditFormat::TABLE)
             ->endComposer()
 
             ->container()

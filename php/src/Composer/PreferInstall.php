@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-namespace DaggerModule;
+namespace DaggerModule\Composer;
 
+use Dagger\Attribute\DaggerObject;
+
+#[DaggerObject]
 enum PreferInstall: string
 {
     case Dist = 'dist';

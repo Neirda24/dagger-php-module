@@ -62,7 +62,7 @@ final class Pie
             return;
         }
 
-        $pieBin = dag()->container()->from('ghcr.io/php/pie:bin')->file('/pie');
+        $pieBin = dag()->container()->from('ghcr.io/php/pie:nightly-bin')->file('/pie');
 
         $this->container = $this->getContainer()
             ->withExec(['apt', 'update'])
@@ -76,7 +76,7 @@ final class Pie
                 'pkg-config',
                 'unzip',
             ])
-            ->withFile('/usr/bin/pie', $pieBin)
+            ->withFile('/usr/local/bin/pie', $pieBin)
         ;
 
         $this->pieInstalled = true;
@@ -89,25 +89,42 @@ final class Pie
         #[Doc('Package name and optional version constraint in the format {vendor/package}{?:{?version}{?@stability}}. Examples: "xdebug/xdebug", "xdebug/xdebug:^3.4", "xdebug/xdebug:^3.4@alpha".')]
         array $packages = [],
 
+        #[ListOfType('string')]
+        #[Doc('You can provide PIE a map of which packages to use for each missing extension. Examples: "example_pie_extension=asgrim/example-pie-extension", "redis=phpredis/phpredis".')]
+        array $selects = [],
+
         #[Doc('Force installation even when the version does not match metadata constraints or when signature verification is unavailable.')]
         bool $force = false,
     ): Pie {
         $that = clone $this;
         $that->installPie();
 
-        $installCmd = ['pie', 'install', '--allow-non-interactive-project-install'];
+        $installCmd = ['pie', 'install'];
 
         if ($force === true) {
             $installCmd[] = '--force';
         }
+
+        $selects = array_filter(
+            array_map(static fn (mixed $p) => trim((string) $p), $selects),
+            static fn (string $p) => $p !== '',
+        );
 
         $packages = array_filter(
             array_map(static fn (mixed $p) => trim((string) $p), $packages),
             static fn (string $p) => $p !== '',
         );
 
-        foreach ($packages as $package) {
-            $that->container = $that->getContainer()->withExec([...$installCmd, $package]);
+        foreach ($selects as $select) {
+            $installCmd[] = "--select={$select}";
+        }
+
+        if ([] === $packages) {
+            $that->container = $that->getContainer()->withExec($installCmd);
+        } else {
+            foreach ($packages as $package) {
+                $that->container = $that->getContainer()->withExec([...$installCmd, $package]);
+            }
         }
 
         return $that;

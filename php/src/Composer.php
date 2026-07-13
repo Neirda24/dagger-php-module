@@ -10,6 +10,8 @@ use Dagger\Attribute\Doc;
 use Dagger\Attribute\ListOfType;
 use Dagger\Container;
 use Dagger\ReturnType;
+use DaggerModule\Composer\AuditFormat;
+use DaggerModule\Composer\PreferInstall;
 use function array_filter;
 use function array_map;
 use function Dagger\dag;
@@ -107,10 +109,10 @@ final class Composer
         bool $progress = true,
 
         #[Doc('Run a security audit after install and format the output.')]
-        AuditFormat|null $audit = null,
+        AuditFormat|null $audit = AuditFormat::Plain,
 
         #[Doc('Preferred installation method: dist (default), source, or auto.')]
-        PreferInstall|null $preferInstall = null,
+        PreferInstall|null $preferInstall = PreferInstall::Auto,
     ): Composer {
         $that = clone $this;
         $that->installComposer();
